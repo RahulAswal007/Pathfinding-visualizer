@@ -63,7 +63,3 @@ A web-based application that visualizes various pathfinding algorithms on a grid
 - Add animation for the algorithm's exploration process
 - Implement mobile-friendly controls
 - Add interactive tutorial mode
-
-## License
-
-MIT 
