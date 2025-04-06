@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pathfinding Visualizer</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Pathfinding Visualizer</h1>
+        <div class="controls">
+            <select id="algorithm">
+                <option value="bfs">Breadth-First Search</option>
+                <option value="dfs">Depth-First Search</option>
+                <option value="dijkstra">Dijkstra's Algorithm</option>
+                <option value="bellmanford">Bellman-Ford Algorithm</option>
+                <option value="floydwarshall">Floyd-Warshall Algorithm</option>
+                <option value="astar">A* Algorithm</option>
+            </select>
+            <button id="visualize">Visualize</button>
+            <button id="clear">Clear Board</button>
+            <button id="compare-mode" class="compare-btn">Compare Mode</button>
+        </div>
+        <div class="compare-controls" style="display: none;">
+            <div class="algorithm-selectors">
+                <div>
+                    <label for="algorithm1">Algorithm 1:</label>
+                    <select id="algorithm1">
+                        <option value="bfs">Breadth-First Search</option>
+                        <option value="dfs">Depth-First Search</option>
+                        <option value="dijkstra">Dijkstra's Algorithm</option>
+                        <option value="bellmanford">Bellman-Ford Algorithm</option>
+                        <option value="floydwarshall">Floyd-Warshall Algorithm</option>
+                        <option value="astar">A* Algorithm</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="algorithm2">Algorithm 2:</label>
+                    <select id="algorithm2">
+                        <option value="bfs">Breadth-First Search</option>
+                        <option value="dijkstra" selected>Dijkstra's Algorithm</option>
+                        <option value="dfs">Depth-First Search</option>
+                        <option value="bellmanford">Bellman-Ford Algorithm</option>
+                        <option value="floydwarshall">Floyd-Warshall Algorithm</option>
+                        <option value="astar">A* Algorithm</option>
+                    </select>
+                </div>
+            </div>
+            <button id="start-comparison">Start Comparison</button>
+            <button id="exit-compare">Exit Compare Mode</button>
+        </div>
+    </div>
+    <div class="legend">
+        <div class="legend-item">
+            <div class="node start"></div>
+            <span>Start Node</span>
+        </div>
+        <div class="legend-item">
+            <div class="node end"></div>
+            <span>End Node</span>
+        </div>
+        <div class="legend-item">
+            <div class="node wall"></div>
+            <span>Wall</span>
+        </div>
+        <div class="legend-item">
+            <div class="node visited"></div>
+            <span>Visited Node</span>
+        </div>
+        <div class="legend-item">
+            <div class="node path"></div>
+            <span>Shortest Path</span>
+        </div>
+    </div>
+    <div class="instructions">
+        <p>Click and drag to create walls. Drag the start (green) and end (red) nodes to move them.</p>
+    </div>
+    <div id="comparison-container" style="display: none;">
+        <div class="comparison-stats">
+            <div id="algo1-stats" class="algo-stats">
+                <h3 id="algo1-name">Algorithm 1</h3>
+                <p>Nodes visited: <span id="algo1-visited-count">0</span></p>
+                <p>Path length: <span id="algo1-path-length">0</span></p>
+                <p>Time: <span id="algo1-time">0</span> ms</p>
+            </div>
+            <div id="algo2-stats" class="algo-stats">
+                <h3 id="algo2-name">Algorithm 2</h3>
+                <p>Nodes visited: <span id="algo2-visited-count">0</span></p>
+                <p>Path length: <span id="algo2-path-length">0</span></p>
+                <p>Time: <span id="algo2-time">0</span> ms</p>
+            </div>
+        </div>
+        <div class="grid-container">
+            <div id="grid1" class="compare-grid"></div>
+            <div id="grid2" class="compare-grid"></div>
+        </div>
+    </div>
+    <div id="grid"></div>
+    
+    <script src="grid.js"></script>
+    <script src="algorithms.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
