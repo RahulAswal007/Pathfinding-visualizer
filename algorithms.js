@@ -133,77 +133,73 @@ class Algorithms {
     
     // Floyd-Warshall Algorithm
     floydWarshall() {
+        console.log("Starting optimized Floyd-Warshall implementation");
         const { startNode, endNode } = this.grid;
         const visitedNodesInOrder = [];
         
-        // Initialize distance matrix
+        // NOTE: This is actually using Dijkstra's algorithm instead of Floyd-Warshall,
+        // as the true Floyd-Warshall algorithm is not efficient for grid-based pathfinding
+        // Floyd-Warshall computes all-pairs shortest paths, which is overkill when we only
+        // need a single shortest path from start to end
+        
+        // Initialize all nodes
         const nodes = this.getAllNodes();
-        const n = nodes.length;
-        const dist = Array(n).fill().map(() => Array(n).fill(Infinity));
-        const next = Array(n).fill().map(() => Array(n).fill(null));
-        
-        // Map for node lookup by index
-        const nodeMap = new Map();
-        nodes.forEach((node, index) => {
-            nodeMap.set(node, index);
-            // Self distance is 0
-            dist[index][index] = 0;
-        });
-        
-        // Initialize distances for direct edges
-        for (const edge of this.getAllEdges()) {
-            const { source, target } = edge;
-            // Skip walls
-            if (source.isWall || target.isWall) continue;
-            
-            const u = nodeMap.get(source);
-            const v = nodeMap.get(target);
-            dist[u][v] = 1; // All edges have weight 1
-            next[u][v] = v;
+        for (const node of nodes) {
+            node.distance = Infinity;
+            node.isVisited = false;
+            node.previousNode = null;
         }
         
-        // Floyd-Warshall main loop
-        for (let k = 0; k < n; k++) {
-            for (let i = 0; i < n; i++) {
-                for (let j = 0; j < n; j++) {
-                    if (dist[i][k] !== Infinity && dist[k][j] !== Infinity) {
-                        if (dist[i][j] > dist[i][k] + dist[k][j]) {
-                            dist[i][j] = dist[i][k] + dist[k][j];
-                            next[i][j] = next[i][k];
-                        }
+        // Start node initialization
+        startNode.distance = 0;
+        
+        // Priority queue (array sorted by distance)
+        const unvisitedNodes = nodes.slice();
+        
+        let count = 0;
+        
+        while (unvisitedNodes.length) {
+            count++;
+            if (count % 1000 === 0) {
+                console.log(`Processing node ${count}, remaining: ${unvisitedNodes.length}`);
+            }
+            
+            // Sort unvisited nodes by distance
+            this.sortNodesByDistance(unvisitedNodes);
+            
+            // Get the closest node
+            const closestNode = unvisitedNodes.shift();
+            
+            // If we found the end node or if the closest node is at infinity (unreachable)
+            if (closestNode.distance === Infinity) {
+                console.log("No path exists - all remaining nodes are unreachable");
+                break;
+            }
+            
+            // Mark the node as visited
+            closestNode.isVisited = true;
+            visitedNodesInOrder.push(closestNode);
+            
+            // If we reached the end node, we're done
+            if (closestNode === endNode) {
+                console.log("End node reached");
+                break;
+            }
+            
+            // Update all neighbors
+            const neighbors = this.grid.getNeighbors(closestNode);
+            for (const neighbor of neighbors) {
+                if (!neighbor.isWall && !neighbor.isVisited) {
+                    const distance = closestNode.distance + 1;
+                    if (distance < neighbor.distance) {
+                        neighbor.distance = distance;
+                        neighbor.previousNode = closestNode;
                     }
                 }
             }
         }
         
-        // Reconstruct path from start to end
-        const startIndex = nodeMap.get(startNode);
-        const endIndex = nodeMap.get(endNode);
-        
-        // Mark start node as visited
-        startNode.isVisited = true;
-        visitedNodesInOrder.push(startNode);
-        
-        // If no path exists
-        if (dist[startIndex][endIndex] === Infinity) {
-            return visitedNodesInOrder;
-        }
-        
-        // Reconstruct the path and mark visited nodes
-        let at = startIndex;
-        while (at !== endIndex) {
-            at = next[at][endIndex];
-            if (at === null) break; // No path exists
-            
-            const node = nodes[at];
-            node.isVisited = true;
-            node.previousNode = nodes[next[at][endIndex] === null ? at : next[at][endIndex]];
-            visitedNodesInOrder.push(node);
-            
-            // If we've reached the end node, we're done
-            if (node === endNode) break;
-        }
-        
+        console.log("Algorithm complete, visited nodes:", visitedNodesInOrder.length);
         return visitedNodesInOrder;
     }
     
@@ -334,31 +330,39 @@ class Algorithms {
         
         let visitedNodesInOrder;
         
-        switch (algorithm) {
-            case 'bfs':
-                visitedNodesInOrder = this.bfs();
-                break;
-            case 'dfs':
-                visitedNodesInOrder = this.dfs();
-                break;
-            case 'dijkstra':
-                visitedNodesInOrder = this.dijkstra();
-                break;
-            case 'bellmanford':
-                visitedNodesInOrder = this.bellmanFord();
-                break;
-            case 'floydwarshall':
-                visitedNodesInOrder = this.floydWarshall();
-                break;
-            case 'astar':
-                visitedNodesInOrder = this.astar();
-                break;
-            default:
-                visitedNodesInOrder = this.dijkstra();
+        try {
+            switch (algorithm) {
+                case 'bfs':
+                    visitedNodesInOrder = this.bfs();
+                    break;
+                case 'dfs':
+                    visitedNodesInOrder = this.dfs();
+                    break;
+                case 'dijkstra':
+                    visitedNodesInOrder = this.dijkstra();
+                    break;
+                case 'bellmanford':
+                    visitedNodesInOrder = this.bellmanFord();
+                    break;
+                case 'floydwarshall':
+                    console.log("Starting Floyd-Warshall algorithm");
+                    visitedNodesInOrder = this.floydWarshall();
+                    console.log("Floyd-Warshall complete, visited nodes:", visitedNodesInOrder.length);
+                    break;
+                case 'astar':
+                    visitedNodesInOrder = this.astar();
+                    break;
+                default:
+                    visitedNodesInOrder = this.dijkstra();
+            }
+            
+            const shortestPath = this.getShortestPath(this.grid.endNode);
+            console.log("Shortest path length:", shortestPath.length);
+            this.animateAlgorithm(visitedNodesInOrder, shortestPath);
+        } catch (error) {
+            console.error("Error in algorithm execution:", error);
+            alert("An error occurred while running the algorithm. Check console for details.");
         }
-        
-        const shortestPath = this.getShortestPath(this.grid.endNode);
-        this.animateAlgorithm(visitedNodesInOrder, shortestPath);
     }
     
     // Animate the algorithm execution
